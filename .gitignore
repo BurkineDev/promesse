@@ -24,3 +24,9 @@ prisma/dev.db-journal
 
 # Docker
 **/.docker/
+
+# Node / Nest
+**/node_modules/
+**/dist/
+**/.env
+**/.env.*

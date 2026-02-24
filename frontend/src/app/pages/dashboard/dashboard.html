@@ -1,0 +1,14 @@
+<h2>Dashboard</h2>
+
+<p *ngIf="loading">Loading user...</p>
+
+<div *ngIf="!loading && user; else err">
+  <p><strong>ID:</strong> {{ user.id }}</p>
+  <p><strong>Email:</strong> {{ user.email }}</p>
+</div>
+
+<ng-template #err>
+  <p *ngIf="!loading" style="color: red;">
+    {{ error ?? 'No user loaded' }}
+  </p>
+</ng-template>

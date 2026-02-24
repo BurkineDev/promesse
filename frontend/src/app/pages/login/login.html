@@ -1,0 +1,23 @@
+<h2>Login</h2>
+
+<form (ngSubmit)="submit()">
+  <div>
+    <label>Email</label><br />
+    <input name="email" [(ngModel)]="email" type="email" required />
+  </div>
+
+  <div style="margin-top: 10px;">
+    <label>Password</label><br />
+    <input name="password" [(ngModel)]="password" type="password" required />
+  </div>
+
+  <div style="margin-top: 12px;">
+    <button type="submit" [disabled]="loading">
+      {{ loading ? 'Loading...' : 'Login' }}
+    </button>
+  </div>
+
+  <p *ngIf="error" style="color: red; margin-top: 12px;">
+    {{ error }}
+  </p>
+</form>

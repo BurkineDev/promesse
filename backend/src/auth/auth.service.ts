@@ -15,9 +15,9 @@ export class AuthService {
     private readonly jwt: JwtService,
   ) {}
 
-  // ---------------------
+  // =====================
   // Helpers
-  // ---------------------
+  // =====================
 
   private async hash(data: string): Promise<string> {
     return bcrypt.hash(data, 12);
@@ -50,9 +50,9 @@ export class AuthService {
     return { accessToken, refreshToken };
   }
 
-  // ---------------------
+  // =====================
   // Public methods
-  // ---------------------
+  // =====================
 
   async register(email: string, password: string): Promise<Tokens> {
     const existing = await this.users.findByEmail(email);
@@ -90,7 +90,29 @@ export class AuthService {
     return tokens;
   }
 
-  async refresh(userId: string, refreshToken: string): Promise<Tokens> {
+  // =====================
+  // REFRESH (Secure Version)
+  // =====================
+
+  async refresh(refreshToken: string): Promise<Tokens> {
+    const refreshSecret = process.env.JWT_REFRESH_SECRET;
+
+    if (!refreshSecret) {
+      throw new UnauthorizedException("JWT secret not configured");
+    }
+
+    let payload: any;
+
+    try {
+      payload = await this.jwt.verifyAsync(refreshToken, {
+        secret: refreshSecret,
+      });
+    } catch {
+      throw new UnauthorizedException("Invalid refresh token");
+    }
+
+    const userId = payload.sub as string;
+
     const user = await this.users.findById(userId);
 
     if (!user || !user.refreshTokenHash) {
@@ -113,6 +135,10 @@ export class AuthService {
 
     return tokens;
   }
+
+  // =====================
+  // LOGOUT
+  // =====================
 
   async logout(userId: string) {
     await this.users.updateRefreshTokenHash(userId, null);

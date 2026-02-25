@@ -16,6 +16,10 @@ model User {
 
   goals        Goal[]
   transactions Transaction[]
+
+  accounts          Account[]
+  ledgerTransactions LedgerTransaction[]
+
 }
 
 enum GoalStatus {
@@ -73,4 +77,72 @@ model Transaction {
 
   // Enforce idempotency per user (nullable OK in Postgres)
   @@unique([userId, idempotencyKey])
+}
+
+// =======================
+// Ledger (Double-entry)
+// =======================
+
+enum AccountType {
+  USER_MAIN
+  GOAL
+  SYSTEM_CLEARING
+  PLATFORM_REVENUE
+}
+
+enum EntryDirection {
+  DEBIT
+  CREDIT
+}
+
+enum LedgerTxType {
+  LEGACY_DEPOSIT
+  LEGACY_WITHDRAWAL
+  TRANSFER
+  CASHIN
+  CASHOUT
+  FEE
+}
+
+model Account {
+  id        String      @id @default(uuid())
+  userId    String?
+  type      AccountType
+  createdAt DateTime    @default(now())
+
+  user      User?       @relation(fields: [userId], references: [id])
+  entries   Entry[]
+
+  @@index([userId])
+  @@index([type])
+}
+
+model LedgerTransaction {
+  id             String       @id @default(uuid())
+  userId         String?
+  type           LedgerTxType
+  reference      String?
+  idempotencyKey String?
+  createdAt      DateTime     @default(now())
+
+  user           User?        @relation(fields: [userId], references: [id])
+  entries        Entry[]
+
+  @@index([userId, createdAt])
+  @@unique([userId, idempotencyKey])
+}
+
+model Entry {
+  id                  String             @id @default(uuid())
+  ledgerTransactionId String
+  accountId           String
+  amountMinor         BigInt
+  direction           EntryDirection
+  createdAt           DateTime           @default(now())
+
+  ledgerTransaction   LedgerTransaction  @relation(fields: [ledgerTransactionId], references: [id], onDelete: Cascade)
+  account             Account            @relation(fields: [accountId], references: [id], onDelete: Restrict)
+
+  @@index([accountId, createdAt])
+  @@index([ledgerTransactionId])
 }

@@ -37,6 +37,7 @@ model Goal {
   userId            String
   name              String
   status            GoalStatus @default(ACTIVE)
+  accountId         String?
 
   // Future-ready (not used in MVP logic yet)
   lockedUntil       DateTime?
@@ -48,7 +49,9 @@ model Goal {
 
   user         User          @relation(fields: [userId], references: [id])
   transactions Transaction[]
+  account   Account? @relation(fields: [accountId], references: [id])
 
+  @@index([accountId])
   @@index([userId])
 }
 
@@ -111,6 +114,7 @@ model Account {
   createdAt DateTime    @default(now())
 
   user      User?       @relation(fields: [userId], references: [id])
+  goals     Goal[]
   entries   Entry[]
 
   @@index([userId])

@@ -7,13 +7,26 @@ export class BalanceProjectionService {
 
   /**
    * Returns the computed balance (in minor units) for a given goal.
-   * TODO: implement aggregation logic (SUM deposits − SUM withdrawals).
+   * balance = SUM(DEPOSIT amounts) − SUM(WITHDRAWAL amounts)
    */
   async getGoalBalance(
     userId: string,
     goalId: string,
   ): Promise<{ balanceMinor: bigint }> {
-    // TODO: implement
-    throw new Error("Not implemented");
+    const [deposits, withdrawals] = await Promise.all([
+      this.prisma.transaction.aggregate({
+        _sum: { amountMinor: true },
+        where: { userId, goalId, type: "DEPOSIT" },
+      }),
+      this.prisma.transaction.aggregate({
+        _sum: { amountMinor: true },
+        where: { userId, goalId, type: "WITHDRAWAL" },
+      }),
+    ]);
+
+    const totalDeposits = deposits._sum.amountMinor ?? 0n;
+    const totalWithdrawals = withdrawals._sum.amountMinor ?? 0n;
+
+    return { balanceMinor: totalDeposits - totalWithdrawals };
   }
 }

@@ -5,7 +5,6 @@ import { GoalsLedgerService } from "./goals-ledger.service";
 
 @Module({
   controllers: [GoalsController],
-  providers: [BalanceProjectionService],
-  exports: [BalanceProjectionService],
+  providers: [BalanceProjectionService, GoalsLedgerService],
 })
 export class GoalsModule {}

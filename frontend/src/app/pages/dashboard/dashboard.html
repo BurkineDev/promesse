@@ -12,3 +12,40 @@
     {{ error ?? 'No user loaded' }}
   </p>
 </ng-template>
+
+<hr />
+
+<h3>Goals</h3>
+
+<div style="margin-bottom: 12px;">
+  <input
+    type="text"
+    [(ngModel)]="newGoalName"
+    placeholder="New goal name"
+    style="padding: 6px; width: 260px;"
+  />
+  <button (click)="createGoal()" [disabled]="creatingGoal" style="margin-left: 8px; padding: 6px 10px;">
+    {{ creatingGoal ? 'Creating...' : 'Create' }}
+  </button>
+
+  <p *ngIf="createError" style="color: red; margin-top: 8px;">
+    {{ createError }}
+  </p>
+</div>
+
+<p *ngIf="goalsLoading">Loading goals...</p>
+
+<p *ngIf="!goalsLoading && goalsError" style="color: red;">
+  {{ goalsError }}
+</p>
+
+<ul *ngIf="!goalsLoading && !goalsError">
+  <li *ngFor="let g of goals">
+    <strong>{{ g.name }}</strong> — {{ g.status }}
+    <span *ngIf="g.accountId"> (acct: {{ g.accountId }})</span>
+  </li>
+</ul>
+
+<p *ngIf="!goalsLoading && !goalsError && goals.length === 0">
+  No goals yet.
+</p>

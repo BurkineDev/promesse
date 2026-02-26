@@ -24,8 +24,6 @@ export class GoalsController {
     private readonly ledger: GoalsLedgerService,
   ) {}
 
-  // ---------- CRUD Goals ----------
-
   @Post()
   async create(@Req() req: any, @Body() dto: CreateGoalDto) {
     const userId: string = req.user.sub;
@@ -50,26 +48,15 @@ export class GoalsController {
     return this.goals.archiveGoal(userId, goalId);
   }
 
-  // ---------- Balance ----------
-
   @Get(":id/balance")
   async getBalance(@Param("id") goalId: string, @Req() req: any) {
     const userId: string = req.user.sub;
-    const { balanceMinor } = await this.balanceProjection.getGoalBalance(
-      userId,
-      goalId,
-    );
+    const { balanceMinor } = await this.balanceProjection.getGoalBalance(userId, goalId);
     return { balanceMinor: balanceMinor.toString() };
   }
 
-  // ---------- Ledger movements ----------
-
   @Post(":id/deposit")
-  async deposit(
-    @Req() req: any,
-    @Param("id") goalId: string,
-    @Body() dto: GoalMovementDto,
-  ) {
+  async deposit(@Req() req: any, @Param("id") goalId: string, @Body() dto: GoalMovementDto) {
     const userId: string = req.user.sub;
     return this.ledger.depositToGoal({
       userId,
@@ -81,11 +68,7 @@ export class GoalsController {
   }
 
   @Post(":id/withdraw")
-  async withdraw(
-    @Req() req: any,
-    @Param("id") goalId: string,
-    @Body() dto: GoalMovementDto,
-  ) {
+  async withdraw(@Req() req: any, @Param("id") goalId: string, @Body() dto: GoalMovementDto) {
     const userId: string = req.user.sub;
     return this.ledger.withdrawFromGoal({
       userId,

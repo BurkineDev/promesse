@@ -7,19 +7,16 @@ datasource db {
 }
 
 model User {
-  id               String        @id @default(uuid())
-  email            String        @unique
+  id               String   @id @default(uuid())
+  email            String   @unique
   password         String
   refreshTokenHash String?
-  createdAt        DateTime      @default(now())
-  updatedAt        DateTime      @updatedAt
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 
-  goals        Goal[]
-  transactions Transaction[]
-
-  accounts          Account[]
+  goals              Goal[]
+  accounts           Account[]
   ledgerTransactions LedgerTransaction[]
-
 }
 
 enum GoalStatus {
@@ -27,17 +24,12 @@ enum GoalStatus {
   ARCHIVED
 }
 
-enum TransactionType {
-  DEPOSIT
-  WITHDRAWAL
-}
-
 model Goal {
-  id                String     @id @default(uuid())
-  userId            String
-  name              String
-  status            GoalStatus @default(ACTIVE)
-  accountId         String?
+  id        String     @id @default(uuid())
+  userId    String
+  name      String
+  status    GoalStatus @default(ACTIVE)
+  accountId String?
 
   // Future-ready (not used in MVP logic yet)
   lockedUntil       DateTime?
@@ -47,39 +39,11 @@ model Goal {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  user         User          @relation(fields: [userId], references: [id])
-  transactions Transaction[]
-  account   Account? @relation(fields: [accountId], references: [id])
+  user    User     @relation(fields: [userId], references: [id])
+  account Account? @relation(fields: [accountId], references: [id])
 
   @@index([accountId])
   @@index([userId])
-}
-
-model Transaction {
-  id          String          @id @default(uuid())
-  userId      String
-  goalId      String
-  type        TransactionType
-  amountMinor BigInt
-
-  note       String?
-  createdAt  DateTime @default(now())
-  occurredAt DateTime?
-
-  // Idempotency & future internal transfers
-  idempotencyKey  String?
-  transferGroupId String?
-
-  user User @relation(fields: [userId], references: [id])
-  goal Goal @relation(fields: [goalId], references: [id])
-
-  @@index([goalId, createdAt])
-  @@index([goalId, type])
-  @@index([userId, createdAt])
-  @@index([transferGroupId])
-
-  // Enforce idempotency per user (nullable OK in Postgres)
-  @@unique([userId, idempotencyKey])
 }
 
 // =======================
@@ -113,9 +77,9 @@ model Account {
   type      AccountType
   createdAt DateTime    @default(now())
 
-  user      User?       @relation(fields: [userId], references: [id])
-  goals     Goal[]
-  entries   Entry[]
+  user    User?   @relation(fields: [userId], references: [id])
+  goals   Goal[]
+  entries Entry[]
 
   @@index([userId])
   @@index([type])
@@ -129,23 +93,23 @@ model LedgerTransaction {
   idempotencyKey String?
   createdAt      DateTime     @default(now())
 
-  user           User?        @relation(fields: [userId], references: [id])
-  entries        Entry[]
+  user    User?   @relation(fields: [userId], references: [id])
+  entries Entry[]
 
-  @@index([userId, createdAt])
   @@unique([userId, idempotencyKey])
+  @@index([userId, createdAt])
 }
 
 model Entry {
-  id                  String             @id @default(uuid())
+  id                  String         @id @default(uuid())
   ledgerTransactionId String
   accountId           String
   amountMinor         BigInt
   direction           EntryDirection
-  createdAt           DateTime           @default(now())
+  createdAt           DateTime       @default(now())
 
-  ledgerTransaction   LedgerTransaction  @relation(fields: [ledgerTransactionId], references: [id], onDelete: Cascade)
-  account             Account            @relation(fields: [accountId], references: [id], onDelete: Restrict)
+  ledgerTransaction LedgerTransaction @relation(fields: [ledgerTransactionId], references: [id], onDelete: Cascade)
+  account           Account           @relation(fields: [accountId], references: [id], onDelete: Restrict)
 
   @@index([accountId, createdAt])
   @@index([ledgerTransactionId])

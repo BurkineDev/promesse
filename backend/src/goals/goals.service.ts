@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
-import { GoalStatus } from "@prisma/client";
+import { AccountType, GoalStatus } from "@prisma/client";
 
 type CreateGoalInput = {
   name: string;
@@ -12,6 +12,7 @@ type CreateGoalInput = {
 type GoalResponse = {
   id: string;
   userId: string;
+  accountId: string | null;
   name: string;
   status: GoalStatus;
   lockedUntil: string | null;
@@ -29,6 +30,7 @@ export class GoalsService {
     return {
       id: goal.id,
       userId: goal.userId,
+      accountId: goal.accountId ?? null,
       name: goal.name,
       status: goal.status,
       lockedUntil: goal.lockedUntil ? goal.lockedUntil.toISOString() : null,
@@ -51,15 +53,26 @@ export class GoalsService {
     const targetDate = input.targetDate ? new Date(input.targetDate) : undefined;
     const lockedUntil = input.lockedUntil ? new Date(input.lockedUntil) : undefined;
 
-    const created = await this.prisma.goal.create({
-      data: {
-        userId,
-        name: input.name,
-        status: GoalStatus.ACTIVE,
-        targetAmountMinor,
-        targetDate,
-        lockedUntil,
-      },
+    const created = await this.prisma.$transaction(async (db) => {
+      const account = await db.account.create({
+        data: {
+          userId,
+          type: AccountType.GOAL,
+        },
+        select: { id: true },
+      });
+
+      return db.goal.create({
+        data: {
+          userId,
+          name: input.name,
+          status: GoalStatus.ACTIVE,
+          accountId: account.id,
+          targetAmountMinor,
+          targetDate,
+          lockedUntil,
+        },
+      });
     });
 
     return this.toGoalResponse(created);
@@ -84,7 +97,6 @@ export class GoalsService {
   }
 
   async archiveGoal(userId: string, goalId: string): Promise<GoalResponse> {
-    // ownership enforced by (id + userId) filter
     const updated = await this.prisma.goal.updateMany({
       where: { id: goalId, userId },
       data: { status: GoalStatus.ARCHIVED },
@@ -92,14 +104,11 @@ export class GoalsService {
 
     if (updated.count === 0) throw new NotFoundException("Goal not found");
 
-    // return the updated goal
     const goal = await this.prisma.goal.findFirst({
       where: { id: goalId, userId },
     });
 
-    // should exist if updateMany succeeded
     if (!goal) throw new NotFoundException("Goal not found");
-
     return this.toGoalResponse(goal);
   }
 }

@@ -53,6 +53,7 @@ model Goal {
 enum AccountType {
   USER_MAIN
   GOAL
+  SAVINGS
   SYSTEM_CLEARING
   PLATFORM_REVENUE
 }
@@ -81,6 +82,7 @@ model Account {
   goals   Goal[]
   entries Entry[]
 
+  @@unique([userId, type])
   @@index([userId])
   @@index([type])
 }

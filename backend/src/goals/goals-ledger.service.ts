@@ -45,14 +45,19 @@ export class GoalsLedgerService {
     return totalCredits - totalDebits;
   }
 
-  private async ensureGoalAccount(userId: string, goalId: string): Promise<{ goalAccountId: string; targetDate: Date | null }> {
+  private async ensureGoalAccount(
+    userId: string,
+    goalId: string,
+  ): Promise<{ goalAccountId: string; targetDate: Date | null }> {
     const goal = await this.prisma.goal.findFirst({
       where: { id: goalId, userId },
       select: { id: true, userId: true, accountId: true, targetDate: true },
     });
     if (!goal) throw new NotFoundException("Goal not found");
 
-    if (goal.accountId) return { goalAccountId: goal.accountId, targetDate: goal.targetDate ?? null };
+    if (goal.accountId) {
+      return { goalAccountId: goal.accountId, targetDate: goal.targetDate ?? null };
+    }
 
     const acc = await this.prisma.account.create({
       data: { userId: goal.userId, type: AccountType.GOAL },
@@ -77,7 +82,8 @@ export class GoalsLedgerService {
   }
 
   /**
-   * depositToGoal = TRANSFER USER_MAIN -> GOAL_ACCOUNT
+   * depositToGoal = TRANSFER USER_MAIN -> GOAL
+   * MAIN decreases (DEBIT), GOAL increases (CREDIT)
    */
   async depositToGoal(input: {
     userId: string;
@@ -93,7 +99,7 @@ export class GoalsLedgerService {
     const existingId = await this.ensureIdempotency(input.userId, input.idempotencyKey);
     if (existingId) return { ledgerTransactionId: existingId };
 
-    // balance check on MAIN
+    // Check MAIN balance
     const mainBalance = await this.computeAccountBalance(mainAccountId);
     if (mainBalance < amount) throw new BadRequestException("Insufficient main balance");
 
@@ -110,8 +116,6 @@ export class GoalsLedgerService {
         select: { id: true },
       });
 
-      // MAIN decreases => DEBIT
-      // GOAL increases => CREDIT
       await db.entry.createMany({
         data: [
           { ledgerTransactionId: tx.id, accountId: mainAccountId, direction: EntryDirection.DEBIT, amountMinor: amount },
@@ -126,7 +130,7 @@ export class GoalsLedgerService {
   }
 
   /**
-   * withdrawFromGoal = TRANSFER GOAL_ACCOUNT -> USER_MAIN
+   * withdrawFromGoal = TRANSFER GOAL -> USER_MAIN
    * blocked before targetDate (if set)
    */
   async withdrawFromGoal(input: {
@@ -140,7 +144,7 @@ export class GoalsLedgerService {
     const { goalAccountId, targetDate } = await this.ensureGoalAccount(input.userId, input.goalId);
     const mainAccountId = await this.getUserMainAccountId(input.userId);
 
-    // lock rule: if targetDate exists and now < targetDate => forbidden
+    // Lock rule
     if (targetDate && Date.now() < targetDate.getTime()) {
       throw new ForbiddenException(`Funds locked until ${targetDate.toISOString()}`);
     }
@@ -148,7 +152,7 @@ export class GoalsLedgerService {
     const existingId = await this.ensureIdempotency(input.userId, input.idempotencyKey);
     if (existingId) return { ledgerTransactionId: existingId };
 
-    // balance check on GOAL
+    // Check GOAL balance
     const goalBalance = await this.computeAccountBalance(goalAccountId);
     if (goalBalance < amount) throw new BadRequestException("Insufficient goal balance");
 
@@ -165,8 +169,6 @@ export class GoalsLedgerService {
         select: { id: true },
       });
 
-      // GOAL decreases => DEBIT
-      // MAIN increases => CREDIT
       await db.entry.createMany({
         data: [
           { ledgerTransactionId: tx.id, accountId: goalAccountId, direction: EntryDirection.DEBIT, amountMinor: amount },

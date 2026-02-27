@@ -17,9 +17,21 @@ export class UsersService {
     });
   }
 
-  create(email: string, passwordHash: string) {
-    return this.prisma.user.create({
-      data: { email, password: passwordHash },
+  async create(email: string, passwordHash: string) {
+    return this.prisma.$transaction(async (db) => {
+      const user = await db.user.create({
+        data: { email, password: passwordHash },
+      });
+
+      await db.account.create({
+        data: { userId: user.id, type: "USER_MAIN" },
+      });
+
+      await db.account.create({
+        data: { userId: user.id, type: "SAVINGS" },
+      });
+
+     return user;
     });
   }
 

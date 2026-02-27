@@ -125,4 +125,36 @@ export class GoalsService {
     if (!goal) throw new NotFoundException("Goal not found");
     return this.toGoalResponse(goal);
   }
+
+ async updateGoal(
+   userId: string,
+   goalId: string,
+   input: { targetAmountMinor?: string; targetDate?: string },
+ ): Promise<GoalResponse> {
+   this.assertUserId(userId);
+
+   const targetAmountMinor =
+     input.targetAmountMinor !== undefined && input.targetAmountMinor !== null
+       ? BigInt(input.targetAmountMinor)
+       : undefined;
+
+   const targetDate = input.targetDate ? new Date(input.targetDate) : undefined;
+
+   const updated = await this.prisma.goal.updateMany({
+     where: { id: goalId, userId },
+     data: {
+       ...(targetAmountMinor !== undefined ? { targetAmountMinor } : {}),
+       ...(targetDate !== undefined ? { targetDate } : {}),
+      },
+    });
+
+   if (updated.count === 0) throw new NotFoundException("Goal not found");
+
+   const goal = await this.prisma.goal.findFirst({ where: { id: goalId, userId } });
+   if (!goal) throw new NotFoundException("Goal not found");
+
+   return this.toGoalResponse(goal);
+ }
+
 }
+

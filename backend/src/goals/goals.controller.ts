@@ -13,10 +13,12 @@ import {
 import { Request } from "express";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { BalanceProjectionService } from "./balance-projection.service";
+import { GoalProjectionService } from "./goal-projection.service";
 import { GoalsLedgerService } from "./goals-ledger.service";
+import { CreateGoalDto } from "./dto/create-goal.dto";
 import { GoalMovementDto } from "./dto/goal-movement.dto";
 import { GoalsService } from "./goals.service";
-import { CreateGoalDto } from "./dto/create-goal.dto";
+import { UpdateGoalDto } from "./dto/update-goal.dto";
 
 type JwtUser = { id: string; email: string };
 type AuthedRequest = Request & { user?: JwtUser };
@@ -26,6 +28,7 @@ type AuthedRequest = Request & { user?: JwtUser };
 export class GoalsController {
   constructor(
     private readonly goals: GoalsService,
+    private readonly projection: GoalProjectionService,
     private readonly balanceProjection: BalanceProjectionService,
     private readonly ledger: GoalsLedgerService,
   ) {}
@@ -48,6 +51,16 @@ export class GoalsController {
     return this.goals.listGoals(userId);
   }
 
+  // IMPORTANT: keep this route BEFORE @Get(":id")
+  @Get(":id/projection")
+  async projectionRoute(
+    @Req() req: AuthedRequest,
+    @Param("id", new ParseUUIDPipe({ version: "4" })) goalId: string,
+  ) {
+    const userId = this.getUserId(req);
+    return this.projection.getGoalProjection(userId, goalId);
+  }
+
   @Get(":id")
   async get(
     @Req() req: AuthedRequest,
@@ -56,6 +69,16 @@ export class GoalsController {
     const userId = this.getUserId(req);
     return this.goals.getGoal(userId, goalId);
   }
+ 
+ @Patch(":id")
+ async update(
+   @Req() req: AuthedRequest,
+   @Param("id", new ParseUUIDPipe({ version: "4" })) goalId: string,
+   @Body() dto: UpdateGoalDto,
+ ) {
+   const userId = this.getUserId(req);
+   return this.goals.updateGoal(userId, goalId, dto);
+ }
 
   @Patch(":id/archive")
   async archive(

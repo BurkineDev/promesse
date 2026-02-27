@@ -3,9 +3,10 @@ import { GoalsController } from "./goals.controller";
 import { BalanceProjectionService } from "./balance-projection.service";
 import { GoalsLedgerService } from "./goals-ledger.service";
 import { GoalsService } from "./goals.service";
+import { GoalProjectionService } from "./goal-projection.service";
 
 @Module({
   controllers: [GoalsController],
-  providers: [BalanceProjectionService, GoalsLedgerService, GoalsService],
+  providers: [BalanceProjectionService, GoalsLedgerService, GoalsService, GoalProjectionService ],
 })
 export class GoalsModule {}

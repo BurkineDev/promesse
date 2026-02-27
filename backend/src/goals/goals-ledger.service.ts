@@ -1,4 +1,9 @@
-import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
 import { AccountType, EntryDirection, LedgerTxType } from "@prisma/client";
 
@@ -15,23 +20,39 @@ function parsePositiveBigInt(amountMinor: string): bigint {
 export class GoalsLedgerService {
   constructor(private readonly prisma: PrismaService) {}
 
-  private async getSystemClearingAccountId(): Promise<string> {
+  private async getUserMainAccountId(userId: string): Promise<string> {
     const acc = await this.prisma.account.findFirst({
-      where: { type: AccountType.SYSTEM_CLEARING, userId: null },
+      where: { userId, type: AccountType.USER_MAIN },
       select: { id: true },
     });
-    if (!acc) throw new NotFoundException("SYSTEM_CLEARING account missing");
+    if (!acc) throw new NotFoundException("USER_MAIN account missing");
     return acc.id;
   }
 
-  private async ensureGoalAccount(userId: string, goalId: string): Promise<string> {
+  private async computeAccountBalance(accountId: string): Promise<bigint> {
+    const [credits, debits] = await Promise.all([
+      this.prisma.entry.aggregate({
+        _sum: { amountMinor: true },
+        where: { accountId, direction: EntryDirection.CREDIT },
+      }),
+      this.prisma.entry.aggregate({
+        _sum: { amountMinor: true },
+        where: { accountId, direction: EntryDirection.DEBIT },
+      }),
+    ]);
+    const totalCredits = credits._sum.amountMinor ?? 0n;
+    const totalDebits = debits._sum.amountMinor ?? 0n;
+    return totalCredits - totalDebits;
+  }
+
+  private async ensureGoalAccount(userId: string, goalId: string): Promise<{ goalAccountId: string; targetDate: Date | null }> {
     const goal = await this.prisma.goal.findFirst({
       where: { id: goalId, userId },
-      select: { id: true, userId: true, accountId: true },
+      select: { id: true, userId: true, accountId: true, targetDate: true },
     });
     if (!goal) throw new NotFoundException("Goal not found");
 
-    if (goal.accountId) return goal.accountId;
+    if (goal.accountId) return { goalAccountId: goal.accountId, targetDate: goal.targetDate ?? null };
 
     const acc = await this.prisma.account.create({
       data: { userId: goal.userId, type: AccountType.GOAL },
@@ -43,9 +64,21 @@ export class GoalsLedgerService {
       data: { accountId: acc.id },
     });
 
-    return acc.id;
+    return { goalAccountId: acc.id, targetDate: goal.targetDate ?? null };
   }
 
+  private async ensureIdempotency(userId: string, idempotencyKey?: string) {
+    if (!idempotencyKey) return null;
+    const existing = await this.prisma.ledgerTransaction.findFirst({
+      where: { userId, idempotencyKey },
+      select: { id: true },
+    });
+    return existing?.id ?? null;
+  }
+
+  /**
+   * depositToGoal = TRANSFER USER_MAIN -> GOAL_ACCOUNT
+   */
   async depositToGoal(input: {
     userId: string;
     goalId: string;
@@ -54,33 +87,34 @@ export class GoalsLedgerService {
     idempotencyKey?: string;
   }) {
     const amount = parsePositiveBigInt(input.amountMinor);
-    const goalAccountId = await this.ensureGoalAccount(input.userId, input.goalId);
-    const systemAccountId = await this.getSystemClearingAccountId();
+    const { goalAccountId } = await this.ensureGoalAccount(input.userId, input.goalId);
+    const mainAccountId = await this.getUserMainAccountId(input.userId);
 
-    if (input.idempotencyKey) {
-      const existing = await this.prisma.ledgerTransaction.findFirst({
-        where: { userId: input.userId, idempotencyKey: input.idempotencyKey },
-        select: { id: true },
-      });
-      if (existing) return { ledgerTransactionId: existing.id };
-    }
+    const existingId = await this.ensureIdempotency(input.userId, input.idempotencyKey);
+    if (existingId) return { ledgerTransactionId: existingId };
 
-    const reference = input.reference ?? `cashin:${input.goalId}:${Date.now()}`;
+    // balance check on MAIN
+    const mainBalance = await this.computeAccountBalance(mainAccountId);
+    if (mainBalance < amount) throw new BadRequestException("Insufficient main balance");
+
+    const reference = input.reference ?? `transfer:main->goal:${input.goalId}:${Date.now()}`;
 
     const lt = await this.prisma.$transaction(async (db) => {
       const tx = await db.ledgerTransaction.create({
         data: {
           userId: input.userId,
-          type: LedgerTxType.CASHIN,
+          type: LedgerTxType.TRANSFER,
           reference,
           idempotencyKey: input.idempotencyKey ?? null,
         },
         select: { id: true },
       });
 
+      // MAIN decreases => DEBIT
+      // GOAL increases => CREDIT
       await db.entry.createMany({
         data: [
-          { ledgerTransactionId: tx.id, accountId: systemAccountId, direction: EntryDirection.DEBIT, amountMinor: amount },
+          { ledgerTransactionId: tx.id, accountId: mainAccountId, direction: EntryDirection.DEBIT, amountMinor: amount },
           { ledgerTransactionId: tx.id, accountId: goalAccountId, direction: EntryDirection.CREDIT, amountMinor: amount },
         ],
       });
@@ -91,6 +125,10 @@ export class GoalsLedgerService {
     return { ledgerTransactionId: lt.id };
   }
 
+  /**
+   * withdrawFromGoal = TRANSFER GOAL_ACCOUNT -> USER_MAIN
+   * blocked before targetDate (if set)
+   */
   async withdrawFromGoal(input: {
     userId: string;
     goalId: string;
@@ -99,48 +137,40 @@ export class GoalsLedgerService {
     idempotencyKey?: string;
   }) {
     const amount = parsePositiveBigInt(input.amountMinor);
-    const goalAccountId = await this.ensureGoalAccount(input.userId, input.goalId);
-    const systemAccountId = await this.getSystemClearingAccountId();
+    const { goalAccountId, targetDate } = await this.ensureGoalAccount(input.userId, input.goalId);
+    const mainAccountId = await this.getUserMainAccountId(input.userId);
 
-    // balance check
-    const [credits, debits] = await Promise.all([
-      this.prisma.entry.aggregate({
-        _sum: { amountMinor: true },
-        where: { accountId: goalAccountId, direction: EntryDirection.CREDIT },
-      }),
-      this.prisma.entry.aggregate({
-        _sum: { amountMinor: true },
-        where: { accountId: goalAccountId, direction: EntryDirection.DEBIT },
-      }),
-    ]);
-    const balance = (credits._sum.amountMinor ?? 0n) - (debits._sum.amountMinor ?? 0n);
-    if (balance < amount) throw new BadRequestException("Insufficient goal balance");
-
-    if (input.idempotencyKey) {
-      const existing = await this.prisma.ledgerTransaction.findFirst({
-        where: { userId: input.userId, idempotencyKey: input.idempotencyKey },
-        select: { id: true },
-      });
-      if (existing) return { ledgerTransactionId: existing.id };
+    // lock rule: if targetDate exists and now < targetDate => forbidden
+    if (targetDate && Date.now() < targetDate.getTime()) {
+      throw new ForbiddenException(`Funds locked until ${targetDate.toISOString()}`);
     }
 
-    const reference = input.reference ?? `cashout:${input.goalId}:${Date.now()}`;
+    const existingId = await this.ensureIdempotency(input.userId, input.idempotencyKey);
+    if (existingId) return { ledgerTransactionId: existingId };
+
+    // balance check on GOAL
+    const goalBalance = await this.computeAccountBalance(goalAccountId);
+    if (goalBalance < amount) throw new BadRequestException("Insufficient goal balance");
+
+    const reference = input.reference ?? `transfer:goal->main:${input.goalId}:${Date.now()}`;
 
     const lt = await this.prisma.$transaction(async (db) => {
       const tx = await db.ledgerTransaction.create({
         data: {
           userId: input.userId,
-          type: LedgerTxType.CASHOUT,
+          type: LedgerTxType.TRANSFER,
           reference,
           idempotencyKey: input.idempotencyKey ?? null,
         },
         select: { id: true },
       });
 
+      // GOAL decreases => DEBIT
+      // MAIN increases => CREDIT
       await db.entry.createMany({
         data: [
           { ledgerTransactionId: tx.id, accountId: goalAccountId, direction: EntryDirection.DEBIT, amountMinor: amount },
-          { ledgerTransactionId: tx.id, accountId: systemAccountId, direction: EntryDirection.CREDIT, amountMinor: amount },
+          { ledgerTransactionId: tx.id, accountId: mainAccountId, direction: EntryDirection.CREDIT, amountMinor: amount },
         ],
       });
 

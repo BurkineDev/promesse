@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { Injectable, NotFoundException, UnauthorizedException } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
 import { AccountType, GoalStatus } from "@prisma/client";
 
@@ -26,6 +26,10 @@ type GoalResponse = {
 export class GoalsService {
   constructor(private readonly prisma: PrismaService) {}
 
+  private assertUserId(userId: string) {
+    if (!userId) throw new UnauthorizedException("Missing userId");
+  }
+
   private toGoalResponse(goal: any): GoalResponse {
     return {
       id: goal.id,
@@ -45,6 +49,8 @@ export class GoalsService {
   }
 
   async createGoal(userId: string, input: CreateGoalInput): Promise<GoalResponse> {
+    this.assertUserId(userId);
+
     const targetAmountMinor =
       input.targetAmountMinor !== undefined && input.targetAmountMinor !== null
         ? BigInt(input.targetAmountMinor)
@@ -54,6 +60,7 @@ export class GoalsService {
     const lockedUntil = input.lockedUntil ? new Date(input.lockedUntil) : undefined;
 
     const created = await this.prisma.$transaction(async (db) => {
+      // 1) Compte GOAL (ledger)
       const account = await db.account.create({
         data: {
           userId,
@@ -62,9 +69,10 @@ export class GoalsService {
         select: { id: true },
       });
 
+      // 2) Goal lié au user via FK userId (robuste + compatible types Prisma chez toi)
       return db.goal.create({
         data: {
-          userId,
+          userId, // ✅ ici: jamais undefined grâce à assertUserId()
           name: input.name,
           status: GoalStatus.ACTIVE,
           accountId: account.id,
@@ -79,6 +87,8 @@ export class GoalsService {
   }
 
   async listGoals(userId: string): Promise<GoalResponse[]> {
+    this.assertUserId(userId);
+
     const goals = await this.prisma.goal.findMany({
       where: { userId },
       orderBy: { createdAt: "desc" },
@@ -88,6 +98,8 @@ export class GoalsService {
   }
 
   async getGoal(userId: string, goalId: string): Promise<GoalResponse> {
+    this.assertUserId(userId);
+
     const goal = await this.prisma.goal.findFirst({
       where: { id: goalId, userId },
     });
@@ -97,6 +109,8 @@ export class GoalsService {
   }
 
   async archiveGoal(userId: string, goalId: string): Promise<GoalResponse> {
+    this.assertUserId(userId);
+
     const updated = await this.prisma.goal.updateMany({
       where: { id: goalId, userId },
       data: { status: GoalStatus.ARCHIVED },

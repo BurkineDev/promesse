@@ -1,73 +1,44 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Post,
-  Req,
-  UseGuards,
-} from "@nestjs/common";
+import { Body, Controller, Get, Post, Req, UseGuards } from "@nestjs/common";
+import { Request } from "express";
 import { AuthService } from "./auth.service";
 import { JwtAuthGuard } from "./guards/jwt-auth.guard";
+import { RegisterDto } from "./dto/register.dto";
+import { LoginDto } from "./dto/login.dto";
+import { RefreshDto } from "./dto/refresh.dto";
 
-/* =======================
-   DTOs
-======================= */
-
-class RegisterDto {
-  email!: string;
-  password!: string;
-}
-
-class LoginDto {
-  email!: string;
-  password!: string;
-}
-
-class RefreshDto {
-  refreshToken!: string;
-}
-
-/* =======================
-   Controller
-======================= */
+type JwtUser = { id: string; email: string };
+type AuthedRequest = Request & { user?: JwtUser };
 
 @Controller("auth")
 export class AuthController {
   constructor(private readonly auth: AuthService) {}
-
-  /* ---------- REGISTER ---------- */
 
   @Post("register")
   register(@Body() dto: RegisterDto) {
     return this.auth.register(dto.email, dto.password);
   }
 
-  /* ---------- LOGIN ---------- */
-
   @Post("login")
   login(@Body() dto: LoginDto) {
     return this.auth.login(dto.email, dto.password);
   }
 
-  /* ---------- ME (PROTECTED) ---------- */
-
   @UseGuards(JwtAuthGuard)
   @Get("me")
-  me(@Req() req: any) {
+  me(@Req() req: AuthedRequest) {
     return req.user; // { id, email }
   }
-
-  /* ---------- REFRESH ---------- */
 
   @Post("refresh")
   refresh(@Body() dto: RefreshDto) {
     return this.auth.refresh(dto.refreshToken);
   }
 
-  /* ---------- LOGOUT ---------- */
-
+  @UseGuards(JwtAuthGuard)
   @Post("logout")
-  logout(@Body() dto: { userId: string }) {
-    return this.auth.logout(dto.userId);
+  logout(@Req() req: AuthedRequest) {
+    const userId = req.user?.id;
+    // JwtAuthGuard garantit normalement userId, mais on garde safe
+    return this.auth.logout(userId as string);
   }
 }

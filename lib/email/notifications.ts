@@ -1,7 +1,11 @@
 import { Resend } from "resend";
 import { PackageStatus, STATUS_LABELS } from "@/types";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Lazy init: Resend throws at construction if no API key is set
+function getResend() {
+  return new Resend(process.env.RESEND_API_KEY);
+}
+
 const FROM = process.env.RESEND_FROM_EMAIL || "notifications@promesstrack.com";
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 
@@ -94,7 +98,7 @@ export async function sendStatusNotification(
 </html>
 `;
 
-  await resend.emails.send({
+  await getResend().emails.send({
     from: FROM,
     to: clientEmail,
     subject: `[${trackingNumber}] Votre colis : ${statusLabel}`,

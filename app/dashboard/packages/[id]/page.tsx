@@ -7,6 +7,7 @@ import { formatDate, formatDateTime, formatCurrency } from "@/lib/utils";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { StatusUpdateForm } from "@/components/packages/StatusUpdateForm";
 import { TrackingTimeline } from "@/components/tracking/TrackingTimeline";
+import { PhotoUploadSection } from "@/components/packages/PhotoUploadSection";
 import { PackageStatus, TrackingEvent } from "@/types";
 
 export const metadata: Metadata = { title: "Détail du colis" };
@@ -75,6 +76,13 @@ export default async function PackageDetailPage({
             className="btn-secondary text-sm"
           >
             Vue client
+          </Link>
+          <Link
+            href={`/dashboard/packages/${id}/print`}
+            target="_blank"
+            className="btn-secondary text-sm"
+          >
+            🖨️ Bordereau
           </Link>
           <Link
             href={`/dashboard/packages/${id}/edit`}
@@ -176,6 +184,12 @@ export default async function PackageDetailPage({
               )}
             </div>
           </div>
+
+          {/* Photo */}
+          <PhotoUploadSection
+            packageId={pkg.id}
+            currentPhotoUrl={pkg.photo_url}
+          />
 
           {/* Tracking timeline */}
           <div className="card p-6">

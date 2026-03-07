@@ -3,14 +3,18 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { Package, PaymentMethod, PaymentStatus, PAYMENT_METHOD_LABELS } from "@/types";
+import { PaymentMethod, PaymentStatus, PAYMENT_METHOD_LABELS } from "@/types";
 
-interface PackageWithClient extends Omit<Package, "client"> {
-  client: { name: string } | null;
+interface PackageForPayment {
+  id: string;
+  tracking_number: string;
+  destination: string;
+  // Supabase join returns array for one-to-one relations via foreign key
+  client: { name: string }[] | { name: string } | null;
 }
 
 interface PaymentFormProps {
-  packages: PackageWithClient[];
+  packages: PackageForPayment[];
   defaultPackageId?: string;
 }
 
@@ -76,7 +80,9 @@ export function PaymentForm({ packages, defaultPackageId }: PaymentFormProps) {
           {packages.map((pkg) => (
             <option key={pkg.id} value={pkg.id}>
               {pkg.tracking_number} — {pkg.destination}
-              {pkg.client ? ` (${pkg.client.name})` : ""}
+              {pkg.client
+                ? ` (${Array.isArray(pkg.client) ? pkg.client[0]?.name : pkg.client.name})`
+                : ""}
             </option>
           ))}
         </select>

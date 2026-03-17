@@ -85,7 +85,7 @@ export default function RegisterPage() {
     setError(null);
     setLoading(true);
 
-    const { error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await supabase.auth.signInWithPassword({
       email: form.email, password: form.password,
     });
 
@@ -94,6 +94,22 @@ export default function RegisterPage() {
       setLoading(false);
       return;
     }
+
+    // Redirection selon le rôle
+    if (data.user) {
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("role")
+        .eq("id", data.user.id)
+        .single();
+
+      if (profile?.role === "admin" || profile?.role === "agent") {
+        router.push("/dashboard");
+        router.refresh();
+        return;
+      }
+    }
+
     router.push("/portal");
     router.refresh();
   }

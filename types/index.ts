@@ -4,7 +4,7 @@ export type PackageStatus =
   | "SOUMIS"
   | "EN_ATTENTE_VALIDATION"
   | "RECU"
-  | "ENTREPOT"
+  | "EN_PREPARATION"
   | "PRET_DEPART"
   | "EXPEDIE"
   | "EN_TRANSIT"
@@ -174,7 +174,7 @@ export const STATUS_LABELS: Record<PackageStatus, string> = {
   SOUMIS:                "Soumis",
   EN_ATTENTE_VALIDATION: "En attente de validation",
   RECU:                  "Reçu en agence",
-  ENTREPOT:              "En entrepôt",
+  EN_PREPARATION:        "En préparation",
   PRET_DEPART:           "Prêt au départ",
   EXPEDIE:               "Expédié",
   EN_TRANSIT:            "En transit",
@@ -189,7 +189,7 @@ export const STATUS_COLORS: Record<PackageStatus, string> = {
   SOUMIS:                "bg-slate-100 text-slate-700",
   EN_ATTENTE_VALIDATION: "bg-yellow-100 text-yellow-800",
   RECU:                  "bg-gray-100 text-gray-700",
-  ENTREPOT:              "bg-amber-100 text-amber-700",
+  EN_PREPARATION:        "bg-amber-100 text-amber-700",
   PRET_DEPART:           "bg-cyan-100 text-cyan-700",
   EXPEDIE:               "bg-blue-100 text-blue-700",
   EN_TRANSIT:            "bg-violet-100 text-violet-700",
@@ -204,7 +204,7 @@ export const STATUS_ICONS: Record<PackageStatus, string> = {
   SOUMIS:                "📝",
   EN_ATTENTE_VALIDATION: "⏳",
   RECU:                  "📦",
-  ENTREPOT:              "🏭",
+  EN_PREPARATION:        "🏭",
   PRET_DEPART:           "🔖",
   EXPEDIE:               "✈️",
   EN_TRANSIT:            "🚢",
@@ -219,7 +219,7 @@ export const STATUS_ORDER: PackageStatus[] = [
   "SOUMIS",
   "EN_ATTENTE_VALIDATION",
   "RECU",
-  "ENTREPOT",
+  "EN_PREPARATION",
   "PRET_DEPART",
   "EXPEDIE",
   "EN_TRANSIT",

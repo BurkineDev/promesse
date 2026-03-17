@@ -12,12 +12,18 @@ import {
 import { formatDateTime } from "@/lib/utils";
 
 const STATUS_ICONS: Record<PackageStatus, string> = {
+  SOUMIS: "📝",
+  EN_ATTENTE_VALIDATION: "⏳",
   RECU: "📦",
-  ENTREPOT: "🏭",
+  EN_PREPARATION: "🏭",
+  PRET_DEPART: "🔖",
   EXPEDIE: "✈️",
   EN_TRANSIT: "🚢",
+  EN_COURS_LIVRAISON: "🛵",
   ARRIVE: "📍",
   LIVRE: "✅",
+  INCIDENT: "🚨",
+  ANNULE: "❌",
 };
 
 interface TrackingResult {

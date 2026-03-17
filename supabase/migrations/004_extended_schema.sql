@@ -146,21 +146,42 @@ ALTER TABLE routes    ENABLE ROW LEVEL SECURITY;
 ALTER TABLE shipments ENABLE ROW LEVEL SECURITY;
 ALTER TABLE incidents ENABLE ROW LEVEL SECURITY;
 
+-- Helper: is the current user admin or agent?
+-- (Supabase n'a pas auth_user_role(), on requête profiles directement)
+
 -- Routes : lecture publique, écriture admin/agent
 CREATE POLICY "routes_select"  ON routes    FOR SELECT USING (true);
-CREATE POLICY "routes_insert"  ON routes    FOR INSERT WITH CHECK (auth_user_role() IN ('admin','agent'));
-CREATE POLICY "routes_update"  ON routes    FOR UPDATE USING (auth_user_role() IN ('admin','agent'));
-CREATE POLICY "routes_delete"  ON routes    FOR DELETE USING (auth_user_role() = 'admin');
+CREATE POLICY "routes_insert"  ON routes    FOR INSERT WITH CHECK (
+  EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role IN ('admin','agent'))
+);
+CREATE POLICY "routes_update"  ON routes    FOR UPDATE USING (
+  EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role IN ('admin','agent'))
+);
+CREATE POLICY "routes_delete"  ON routes    FOR DELETE USING (
+  EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'admin')
+);
 
 -- Shipments
-CREATE POLICY "shipments_select" ON shipments FOR SELECT USING (auth_user_role() IN ('admin','agent'));
-CREATE POLICY "shipments_insert" ON shipments FOR INSERT WITH CHECK (auth_user_role() IN ('admin','agent'));
-CREATE POLICY "shipments_update" ON shipments FOR UPDATE USING (auth_user_role() IN ('admin','agent'));
+CREATE POLICY "shipments_select" ON shipments FOR SELECT USING (
+  EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role IN ('admin','agent'))
+);
+CREATE POLICY "shipments_insert" ON shipments FOR INSERT WITH CHECK (
+  EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role IN ('admin','agent'))
+);
+CREATE POLICY "shipments_update" ON shipments FOR UPDATE USING (
+  EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role IN ('admin','agent'))
+);
 
 -- Incidents
-CREATE POLICY "incidents_select" ON incidents FOR SELECT USING (auth_user_role() IN ('admin','agent'));
-CREATE POLICY "incidents_insert" ON incidents FOR INSERT WITH CHECK (auth_user_role() IN ('admin','agent'));
-CREATE POLICY "incidents_update" ON incidents FOR UPDATE USING (auth_user_role() IN ('admin','agent'));
+CREATE POLICY "incidents_select" ON incidents FOR SELECT USING (
+  EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role IN ('admin','agent'))
+);
+CREATE POLICY "incidents_insert" ON incidents FOR INSERT WITH CHECK (
+  EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role IN ('admin','agent'))
+);
+CREATE POLICY "incidents_update" ON incidents FOR UPDATE USING (
+  EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role IN ('admin','agent'))
+);
 
 -- 9. Permettre aux clients de soumettre un colis (SOUMIS)
 CREATE POLICY "packages_client_submit" ON packages
@@ -173,7 +194,7 @@ CREATE POLICY "packages_client_submit" ON packages
 CREATE POLICY "packages_client_select" ON packages
   FOR SELECT USING (
     submitted_by = auth.uid()
-    OR auth_user_role() IN ('admin', 'agent')
+    OR EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role IN ('admin','agent'))
   );
 
 -- Retirer l'ancienne policy trop restrictive

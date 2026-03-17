@@ -9,7 +9,7 @@ export default async function ValidationPage() {
 
   const { data: pending } = await supabase
     .from("packages")
-    .select("*, client:clients(name, phone, email), submitted_by")
+    .select("*, client:clients(name, phone, email), submitter:profiles!submitted_by(name, phone)")
     .in("status", ["SOUMIS", "EN_ATTENTE_VALIDATION"])
     .order("is_urgent", { ascending: false })
     .order("created_at", { ascending: true });

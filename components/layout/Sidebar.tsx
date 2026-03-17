@@ -10,17 +10,17 @@ import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 
 const navItems = [
-  { href: "/dashboard",             label: "Tableau de bord",  icon: LayoutDashboard },
-  { href: "/dashboard/packages",    label: "Colis",            icon: Package },
-  { href: "/dashboard/validation",  label: "Validation",       icon: CheckSquare },
-  { href: "/dashboard/clients",     label: "Clients",          icon: Users },
-  { href: "/dashboard/shipments",   label: "Lots / Départs",   icon: Truck },
-  { href: "/dashboard/payments",    label: "Paiements",        icon: CreditCard },
-  { href: "/dashboard/incidents",   label: "Incidents",        icon: AlertTriangle },
-  { href: "/dashboard/annonces",   label: "Annonces",         icon: Megaphone },
+  { href: "/dashboard",             label: "Tableau de bord",  icon: LayoutDashboard, badge: false },
+  { href: "/dashboard/packages",    label: "Colis",            icon: Package,         badge: false },
+  { href: "/dashboard/validation",  label: "Validation",       icon: CheckSquare,     badge: true  },
+  { href: "/dashboard/clients",     label: "Clients",          icon: Users,           badge: false },
+  { href: "/dashboard/shipments",   label: "Lots / Départs",   icon: Truck,           badge: false },
+  { href: "/dashboard/payments",    label: "Paiements",        icon: CreditCard,      badge: false },
+  { href: "/dashboard/incidents",   label: "Incidents",        icon: AlertTriangle,   badge: false },
+  { href: "/dashboard/annonces",    label: "Annonces",         icon: Megaphone,       badge: false },
 ];
 
-export function Sidebar() {
+export function Sidebar({ pendingCount = 0 }: { pendingCount?: number }) {
   const pathname = usePathname();
   const router = useRouter();
   const supabase = createClient();
@@ -45,11 +45,12 @@ export function Sidebar() {
 
       {/* Navigation */}
       <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
-        {navItems.map(({ href, label, icon: Icon }) => {
+        {navItems.map(({ href, label, icon: Icon, badge }) => {
           const isActive =
             href === "/dashboard"
               ? pathname === "/dashboard"
               : pathname.startsWith(href);
+          const showBadge = badge && pendingCount > 0;
           return (
             <Link key={href} href={href}
               className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
@@ -58,7 +59,12 @@ export function Sidebar() {
                   : "text-blue-200 hover:bg-blue-800 hover:text-white"
               }`}>
               <Icon className="w-5 h-5 flex-shrink-0" />
-              {label}
+              <span className="flex-1">{label}</span>
+              {showBadge && (
+                <span className="bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center leading-none">
+                  {pendingCount > 99 ? "99+" : pendingCount}
+                </span>
+              )}
             </Link>
           );
         })}

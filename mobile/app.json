@@ -1,0 +1,75 @@
+{
+  "expo": {
+    "name": "La Promesse",
+    "slug": "promesse-logistiques",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#1e3a5f"
+    },
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.lapromesse.logistiques",
+      "buildNumber": "1",
+      "infoPlist": {
+        "NSCameraUsageDescription": "Prendre une photo de votre colis pour la soumission.",
+        "NSPhotoLibraryUsageDescription": "Choisir une photo de votre colis depuis votre galerie.",
+        "NSUserNotificationsUsageDescription": "Recevoir des notifications sur le statut de vos colis."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#1e3a5f"
+      },
+      "package": "com.lapromesse.logistiques",
+      "versionCode": 1,
+      "permissions": [
+        "CAMERA",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE",
+        "RECEIVE_BOOT_COMPLETED",
+        "VIBRATE"
+      ]
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/notification-icon.png",
+          "color": "#1e3a5f"
+        }
+      ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Prendre une photo de votre colis pour la soumission."
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Choisir une photo de votre colis depuis votre galerie.",
+          "cameraPermission": "Prendre une photo de votre colis pour la soumission."
+        }
+      ]
+    ],
+    "scheme": "lapromesse",
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "YOUR_EAS_PROJECT_ID"
+      }
+    }
+  }
+}

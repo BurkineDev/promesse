@@ -8,7 +8,9 @@ import { StatusBadge } from "@/components/ui/StatusBadge";
 import { StatusUpdateForm } from "@/components/packages/StatusUpdateForm";
 import { TrackingTimeline } from "@/components/tracking/TrackingTimeline";
 import { PhotoUploadSection } from "@/components/packages/PhotoUploadSection";
-import { PackageStatus, TrackingEvent } from "@/types";
+import { QRCodeCard } from "@/components/packages/QRCodeCard";
+import { generateQRCode } from "@/lib/qrcode";
+import { PackageStatus, TrackingEvent, CATEGORY_LABELS, DIRECTION_LABELS, PackageCategory, Direction } from "@/types";
 
 export const metadata: Metadata = { title: "Détail du colis" };
 
@@ -24,7 +26,7 @@ export default async function PackageDetailPage({
     await Promise.all([
       supabase
         .from("packages")
-        .select("*, client:clients(*)")
+        .select("*, client:clients(*), shipment:shipments(name)")
         .eq("id", id)
         .single(),
       supabase
@@ -40,6 +42,8 @@ export default async function PackageDetailPage({
     ]);
 
   if (!pkg) notFound();
+
+  const qrDataUrl = await generateQRCode(pkg.tracking_number);
 
   const client = pkg.client as {
     id: string;
@@ -261,8 +265,8 @@ export default async function PackageDetailPage({
           </div>
         </div>
 
-        {/* Right column: Status update */}
-        <div>
+        {/* Right column: Status update + QR */}
+        <div className="space-y-4">
           <StatusUpdateForm
             packageId={pkg.id}
             currentStatus={pkg.status as PackageStatus}
@@ -271,6 +275,35 @@ export default async function PackageDetailPage({
             trackingNumber={pkg.tracking_number}
             destination={pkg.destination}
           />
+          <QRCodeCard
+            trackingNumber={pkg.tracking_number}
+            qrDataUrl={qrDataUrl}
+          />
+          {/* Category & direction chips */}
+          <div className="card p-4 space-y-2">
+            <p className="text-xs text-gray-400 font-semibold uppercase tracking-wide">Infos logistiques</p>
+            {pkg.category && (
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-gray-500">Catégorie</span>
+                <span className="font-medium">{CATEGORY_LABELS[pkg.category as PackageCategory] ?? pkg.category}</span>
+              </div>
+            )}
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-gray-500">Sens</span>
+              <span className="font-medium">{DIRECTION_LABELS[pkg.direction as Direction] ?? pkg.direction}</span>
+            </div>
+            {pkg.is_urgent && (
+              <div className="bg-orange-50 border border-orange-200 rounded-lg px-3 py-1.5 text-xs text-orange-700 font-semibold text-center">
+                🚀 Envoi urgent
+              </div>
+            )}
+            {pkg.declared_value && (
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-gray-500">Valeur déclarée</span>
+                <span className="font-medium">{pkg.declared_value} CAD</span>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>

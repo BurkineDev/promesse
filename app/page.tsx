@@ -514,10 +514,10 @@ export default function HomePage() {
               <p className="text-sm font-semibold mb-4 text-white/60">Navigation</p>
               <div className="space-y-2.5">
                 {[
-                  { href: "/track",        label: "Suivre un colis" },
+                  { href: "/track",           label: "Suivre un colis" },
                   { href: "/portal/register", label: "Mon espace client" },
-                  { href: "#comment",      label: "Comment ça marche" },
-                  { href: "#destinations", label: "Destinations" },
+                  { href: "#comment",         label: "Comment ça marche" },
+                  { href: "#destinations",    label: "Destinations" },
                 ].map((l) => (
                   <div key={l.href}>
                     <Link href={l.href} className="text-sm text-blue-300/50 hover:text-white transition-colors">
@@ -543,9 +543,15 @@ export default function HomePage() {
           </div>
           <div className="border-t border-white/10 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-blue-300/30">
             <p>© {new Date().getFullYear()} La Promesse Logistiques. Tous droits réservés.</p>
-            <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-              <span>Service opérationnel</span>
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+                <span>Service opérationnel</span>
+              </div>
+              <Link href="/auth/login"
+                className="text-blue-300/25 hover:text-blue-300/60 transition-colors text-xs">
+                Espace équipe
+              </Link>
             </div>
           </div>
         </div>

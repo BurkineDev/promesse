@@ -9,6 +9,10 @@
   }
 }
 
+/* PWA safe areas (notch, home bar) */
+.safe-area-top    { padding-top: env(safe-area-inset-top, 0); }
+.safe-area-bottom { padding-bottom: env(safe-area-inset-bottom, 0); }
+
 @keyframes float {
   0%, 100% { transform: translateY(0px); }
   50%       { transform: translateY(-10px); }

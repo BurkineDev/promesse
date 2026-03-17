@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard, Users, Package, CreditCard, Search,
-  LogOut, Truck, AlertTriangle, CheckSquare, Globe,
+  LogOut, Truck, AlertTriangle, CheckSquare, Globe, Megaphone,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
@@ -17,6 +17,7 @@ const navItems = [
   { href: "/dashboard/shipments",   label: "Lots / Départs",   icon: Truck },
   { href: "/dashboard/payments",    label: "Paiements",        icon: CreditCard },
   { href: "/dashboard/incidents",   label: "Incidents",        icon: AlertTriangle },
+  { href: "/dashboard/annonces",   label: "Annonces",         icon: Megaphone },
 ];
 
 export function Sidebar() {

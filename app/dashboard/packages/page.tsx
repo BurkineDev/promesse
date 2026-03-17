@@ -34,25 +34,27 @@ export default async function PackagesPage({
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
+      {/* En-tête */}
+      <div className="flex items-center justify-between mb-6 gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Colis</h1>
+          <h1 className="text-xl md:text-2xl font-bold text-gray-900">Colis</h1>
           <p className="text-gray-500 text-sm mt-0.5">
             {count ?? 0} colis enregistré{(count ?? 0) > 1 ? "s" : ""}
           </p>
         </div>
         <Link
           href="/dashboard/packages/new"
-          className="btn-primary flex items-center gap-2"
+          className="btn-primary flex items-center gap-2 text-sm whitespace-nowrap"
         >
           <Plus className="w-4 h-4" />
-          Nouveau colis
+          <span className="hidden sm:inline">Nouveau colis</span>
+          <span className="sm:hidden">Nouveau</span>
         </Link>
       </div>
 
-      {/* Filters */}
-      <div className="flex flex-col sm:flex-row gap-3 mb-6">
-        <div className="relative flex-1">
+      {/* Filtres */}
+      <div className="flex flex-col gap-3 mb-6">
+        <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
           <form>
             <input
@@ -68,11 +70,11 @@ export default async function PackagesPage({
           </form>
         </div>
 
-        {/* Status filter */}
-        <div className="flex gap-2 flex-wrap">
+        {/* Filtre statut — scroll horizontal sur mobile */}
+        <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1 scrollbar-none">
           <Link
             href="/dashboard/packages"
-            className={`px-3 py-1.5 rounded-lg text-sm font-medium border transition-colors ${
+            className={`px-3 py-1.5 rounded-lg text-sm font-medium border transition-colors whitespace-nowrap flex-shrink-0 ${
               !status
                 ? "bg-gray-900 text-white border-gray-900"
                 : "bg-white text-gray-600 border-gray-200 hover:bg-gray-50"
@@ -84,7 +86,7 @@ export default async function PackagesPage({
             <Link
               key={s}
               href={`/dashboard/packages?status=${s}${q ? `&q=${q}` : ""}`}
-              className={`px-3 py-1.5 rounded-lg text-sm font-medium border transition-colors ${
+              className={`px-3 py-1.5 rounded-lg text-sm font-medium border transition-colors whitespace-nowrap flex-shrink-0 ${
                 status === s
                   ? "bg-gray-900 text-white border-gray-900"
                   : "bg-white text-gray-600 border-gray-200 hover:bg-gray-50"
@@ -96,8 +98,44 @@ export default async function PackagesPage({
         </div>
       </div>
 
-      {/* Table */}
-      <div className="card overflow-hidden">
+      {/* Vue mobile : cartes */}
+      <div className="md:hidden space-y-3">
+        {packages && packages.length > 0 ? (
+          packages.map((pkg) => (
+            <Link
+              key={pkg.id}
+              href={`/dashboard/packages/${pkg.id}`}
+              className="card block p-4 hover:bg-gray-50 transition-colors"
+            >
+              <div className="flex items-start justify-between gap-2 mb-2">
+                <span className="font-mono font-semibold text-sm text-gray-900">
+                  {pkg.tracking_number}
+                </span>
+                <StatusBadge status={pkg.status as PackageStatus} size="sm" />
+              </div>
+              <p className="text-sm text-gray-700 font-medium">
+                {(pkg.client as { name: string } | null)?.name ?? "Client inconnu"}
+              </p>
+              <div className="flex items-center justify-between mt-1">
+                <p className="text-xs text-gray-500">{pkg.destination}</p>
+                <p className="text-xs text-gray-400">{formatDate(pkg.created_at)}</p>
+              </div>
+              {pkg.weight && (
+                <p className="text-xs text-gray-400 mt-0.5">{pkg.weight} kg</p>
+              )}
+            </Link>
+          ))
+        ) : (
+          <div className="card p-12 text-center text-gray-400 text-sm">
+            {q || status
+              ? "Aucun colis ne correspond aux critères"
+              : "Aucun colis enregistré"}
+          </div>
+        )}
+      </div>
+
+      {/* Vue desktop : tableau */}
+      <div className="hidden md:block card overflow-hidden">
         <table className="w-full">
           <thead className="bg-gray-50 border-b border-gray-200">
             <tr>

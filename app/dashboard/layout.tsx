@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { Sidebar } from "@/components/layout/Sidebar";
+import { DashboardShell } from "@/components/layout/DashboardShell";
 
 export default async function DashboardLayout({
   children,
@@ -32,11 +32,8 @@ export default async function DashboardLayout({
     .in("status", ["SOUMIS", "EN_ATTENTE_VALIDATION"]);
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
-      <Sidebar pendingCount={pendingCount ?? 0} />
-      <main className="flex-1 ml-64">
-        <div className="p-8">{children}</div>
-      </main>
-    </div>
+    <DashboardShell pendingCount={pendingCount ?? 0}>
+      {children}
+    </DashboardShell>
   );
 }

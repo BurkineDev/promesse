@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard, Users, Package, CreditCard, Search,
-  LogOut, Truck, AlertTriangle, CheckSquare, Globe, Megaphone,
+  LogOut, Truck, AlertTriangle, CheckSquare, Globe, Megaphone, X,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
@@ -20,7 +20,13 @@ const navItems = [
   { href: "/dashboard/annonces",    label: "Annonces",         icon: Megaphone,       badge: false },
 ];
 
-export function Sidebar({ pendingCount = 0 }: { pendingCount?: number }) {
+interface SidebarProps {
+  pendingCount?: number;
+  isOpen?: boolean;
+  onClose?: () => void;
+}
+
+export function Sidebar({ pendingCount = 0, isOpen = false, onClose }: SidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
   const supabase = createClient();
@@ -30,17 +36,35 @@ export function Sidebar({ pendingCount = 0 }: { pendingCount?: number }) {
     router.push("/auth/login");
   }
 
+  function handleNavClick() {
+    onClose?.();
+  }
+
   return (
-    <aside className="w-64 bg-blue-900 text-white flex flex-col h-screen fixed left-0 top-0">
-      {/* Logo */}
-      <div className="px-6 py-5 border-b border-blue-800">
-        <Link href="/dashboard" className="flex items-center gap-2">
+    <aside
+      className={`
+        w-64 bg-blue-900 text-white flex flex-col h-screen fixed left-0 top-0 z-50
+        transition-transform duration-300 ease-in-out
+        md:translate-x-0
+        ${isOpen ? "translate-x-0" : "-translate-x-full"}
+      `}
+    >
+      {/* Logo + bouton fermer (mobile) */}
+      <div className="px-6 py-5 border-b border-blue-800 flex items-center justify-between">
+        <Link href="/dashboard" className="flex items-center gap-2" onClick={handleNavClick}>
           <Package className="w-7 h-7 text-blue-300" />
           <div>
             <p className="text-white font-bold text-lg leading-tight">La Promesse</p>
             <p className="text-blue-400 text-xs">Services Logistiques</p>
           </div>
         </Link>
+        <button
+          onClick={onClose}
+          className="md:hidden p-1.5 rounded-lg text-blue-300 hover:text-white hover:bg-blue-800 transition-colors"
+          aria-label="Fermer le menu"
+        >
+          <X className="w-5 h-5" />
+        </button>
       </div>
 
       {/* Navigation */}
@@ -52,7 +76,7 @@ export function Sidebar({ pendingCount = 0 }: { pendingCount?: number }) {
               : pathname.startsWith(href);
           const showBadge = badge && pendingCount > 0;
           return (
-            <Link key={href} href={href}
+            <Link key={href} href={href} onClick={handleNavClick}
               className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                 isActive
                   ? "bg-blue-700 text-white"
@@ -70,11 +94,11 @@ export function Sidebar({ pendingCount = 0 }: { pendingCount?: number }) {
         })}
 
         <div className="pt-4 border-t border-blue-800 mt-4 space-y-1">
-          <Link href="/track" target="_blank"
+          <Link href="/track" target="_blank" onClick={handleNavClick}
             className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-blue-200 hover:bg-blue-800 hover:text-white transition-colors">
             <Search className="w-5 h-5 flex-shrink-0" />Portail tracking
           </Link>
-          <Link href="/portal" target="_blank"
+          <Link href="/portal" target="_blank" onClick={handleNavClick}
             className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-blue-200 hover:bg-blue-800 hover:text-white transition-colors">
             <Globe className="w-5 h-5 flex-shrink-0" />Portail client
           </Link>
@@ -82,7 +106,7 @@ export function Sidebar({ pendingCount = 0 }: { pendingCount?: number }) {
       </nav>
 
       {/* Logout */}
-      <div className="px-3 py-4 border-t border-blue-800">
+      <div className="px-3 py-4 border-t border-blue-800 safe-area-bottom">
         <button onClick={handleLogout}
           className="flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-sm font-medium text-blue-200 hover:bg-blue-800 hover:text-white transition-colors">
           <LogOut className="w-5 h-5 flex-shrink-0" />Déconnexion

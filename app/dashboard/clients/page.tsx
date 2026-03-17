@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { Metadata } from "next";
 import Link from "next/link";
-import { Plus, Search } from "lucide-react";
+import { Plus, Search, Phone, Mail } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 
 export const metadata: Metadata = { title: "Clients" };
@@ -27,21 +27,23 @@ export default async function ClientsPage({
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
+      {/* En-tête */}
+      <div className="flex items-center justify-between mb-6 gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Clients</h1>
+          <h1 className="text-xl md:text-2xl font-bold text-gray-900">Clients</h1>
           <p className="text-gray-500 text-sm mt-0.5">
             {count ?? 0} client{(count ?? 0) > 1 ? "s" : ""} enregistré
             {(count ?? 0) > 1 ? "s" : ""}
           </p>
         </div>
-        <Link href="/dashboard/clients/new" className="btn-primary flex items-center gap-2">
+        <Link href="/dashboard/clients/new" className="btn-primary flex items-center gap-2 text-sm whitespace-nowrap">
           <Plus className="w-4 h-4" />
-          Nouveau client
+          <span className="hidden sm:inline">Nouveau client</span>
+          <span className="sm:hidden">Nouveau</span>
         </Link>
       </div>
 
-      {/* Search */}
+      {/* Recherche */}
       <div className="relative mb-6">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
         <form>
@@ -55,8 +57,44 @@ export default async function ClientsPage({
         </form>
       </div>
 
-      {/* Table */}
-      <div className="card overflow-hidden">
+      {/* Vue mobile : cartes */}
+      <div className="md:hidden space-y-3">
+        {clients && clients.length > 0 ? (
+          clients.map((client) => (
+            <Link
+              key={client.id}
+              href={`/dashboard/clients/${client.id}`}
+              className="card block p-4 hover:bg-gray-50 transition-colors"
+            >
+              <div className="flex items-start justify-between gap-2 mb-2">
+                <p className="font-semibold text-gray-900">{client.name}</p>
+                <span className="text-xs text-gray-400 whitespace-nowrap">
+                  {formatDate(client.created_at)}
+                </span>
+              </div>
+              {client.phone && (
+                <div className="flex items-center gap-1.5 text-sm text-gray-600 mb-1">
+                  <Phone className="w-3.5 h-3.5 flex-shrink-0" />
+                  {client.phone}
+                </div>
+              )}
+              {client.email && (
+                <div className="flex items-center gap-1.5 text-sm text-gray-500">
+                  <Mail className="w-3.5 h-3.5 flex-shrink-0" />
+                  {client.email}
+                </div>
+              )}
+            </Link>
+          ))
+        ) : (
+          <div className="card p-12 text-center text-gray-400 text-sm">
+            {q ? "Aucun client ne correspond à votre recherche" : "Aucun client enregistré"}
+          </div>
+        )}
+      </div>
+
+      {/* Vue desktop : tableau */}
+      <div className="hidden md:block card overflow-hidden">
         <table className="w-full">
           <thead className="bg-gray-50 border-b border-gray-200">
             <tr>

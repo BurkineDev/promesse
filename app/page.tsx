@@ -70,7 +70,7 @@ export default function HomePage() {
       {/* ══════════════════════════════════════
           HERO  — cargo plane background
       ══════════════════════════════════════ */}
-      <section className="relative min-h-screen flex items-center pt-20 overflow-hidden">
+      <section className="relative flex flex-col pt-20 overflow-hidden">
 
         {/* Background photo */}
         <div className="absolute inset-0">
@@ -87,7 +87,7 @@ export default function HomePage() {
         {/* Glow orbs */}
         <div className="absolute top-1/3 left-0 w-[500px] h-[500px] bg-blue-700/20 rounded-full blur-[150px] pointer-events-none" />
 
-        <div className="relative max-w-6xl mx-auto px-5 py-24 grid lg:grid-cols-2 gap-16 items-center">
+        <div className="relative max-w-6xl mx-auto px-5 pt-24 pb-16 grid lg:grid-cols-2 gap-16 items-center">
           {/* Left — text */}
           <div>
             <div className="animate-fade-up inline-flex items-center gap-2 bg-blue-500/10 border border-blue-500/30 rounded-full px-4 py-2 text-blue-300 text-sm font-medium mb-8">
@@ -136,9 +136,9 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* Right — floating tracking card */}
+          {/* Right — tracking card demo */}
           <div className="animate-slide-right relative flex items-center justify-center">
-            <div className="relative w-full max-w-sm mx-auto animate-float">
+            <div className="relative w-full max-w-sm mx-auto">
               <div className="absolute inset-0 bg-blue-500/20 rounded-3xl blur-2xl" />
               <div className="relative glass rounded-3xl p-6 shadow-2xl">
                 <div className="flex items-center justify-between mb-5">
@@ -179,7 +179,7 @@ export default function HomePage() {
             </div>
 
             {/* Floating badges */}
-            <div className="absolute -top-4 -left-6 glass rounded-2xl px-4 py-2.5 flex items-center gap-2.5 text-sm font-medium animate-float-slow shadow-xl">
+            <div className="absolute -top-4 -left-6 glass rounded-2xl px-4 py-2.5 flex items-center gap-2.5 text-sm font-medium shadow-xl">
               <span className="text-xl">🇨🇦</span>
               <div>
                 <p className="text-[10px] text-blue-300/60 leading-none">Départ</p>
@@ -193,7 +193,7 @@ export default function HomePage() {
               <span className="text-xl">🇲🇱</span>
             </div>
 
-            <div className="absolute -bottom-4 -right-4 glass rounded-2xl px-4 py-2.5 animate-float-d2 shadow-xl">
+            <div className="absolute -bottom-4 -right-4 glass rounded-2xl px-4 py-2.5 shadow-xl">
               <p className="text-[10px] text-blue-300/60 uppercase tracking-wider mb-1">Notification</p>
               <p className="text-sm font-medium flex items-center gap-1.5">
                 <CheckCircle className="w-3.5 h-3.5 text-green-400" />
@@ -203,23 +203,29 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* Quick tracking bar pinned at bottom */}
-        <div className="absolute bottom-10 left-0 right-0 px-5">
-          <div className="max-w-xl mx-auto">
-            <form action="/track" className="glass rounded-2xl p-2 flex gap-2 shadow-2xl animate-pulse-glow">
-              <div className="flex-1 flex items-center gap-2.5 px-4">
-                <Search className="w-4 h-4 text-blue-400 flex-shrink-0" />
-                <input name="numero" placeholder="Entrez votre numéro de tracking : IMP-2026-0001"
-                  className="flex-1 bg-transparent text-white placeholder-blue-300/40 outline-none font-mono text-sm py-2.5" />
-              </div>
-              <button type="submit"
-                className="bg-blue-600 hover:bg-blue-500 text-white font-semibold px-6 py-2.5 rounded-xl text-sm transition-all">
-                Suivre
-              </button>
-            </form>
-          </div>
-        </div>
       </section>
+
+      {/* Quick tracking bar — in normal flow, not overlapping anything */}
+      <div className="bg-[#04091a] pb-16 px-5">
+        <div className="max-w-xl mx-auto">
+          <p className="text-center text-blue-300/50 text-xs font-medium uppercase tracking-widest mb-3">
+            Suivre un colis existant
+          </p>
+          <form action="/track"
+            className="glass rounded-2xl p-2 flex gap-2 shadow-xl border border-blue-500/20">
+            <div className="flex-1 flex items-center gap-2.5 px-4">
+              <Search className="w-4 h-4 text-blue-400 flex-shrink-0" />
+              <input name="numero" placeholder="IMP-2026-0001"
+                className="flex-1 bg-transparent text-white placeholder-blue-300/40 outline-none font-mono text-sm py-2.5"
+                autoComplete="off" />
+            </div>
+            <button type="submit"
+              className="bg-blue-600 hover:bg-blue-500 text-white font-semibold px-6 py-2.5 rounded-xl text-sm transition-colors">
+              Suivre →
+            </button>
+          </form>
+        </div>
+      </div>
 
       {/* ══════════════════════════════════════
           BANDEAU SERVICES

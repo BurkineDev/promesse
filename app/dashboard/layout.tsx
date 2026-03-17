@@ -26,9 +26,14 @@ export default async function DashboardLayout({
     redirect("/auth/login");
   }
 
+  const { count: pendingCount } = await supabase
+    .from("packages")
+    .select("id", { count: "exact", head: true })
+    .in("status", ["SOUMIS", "EN_ATTENTE_VALIDATION"]);
+
   return (
     <div className="flex min-h-screen bg-gray-50">
-      <Sidebar />
+      <Sidebar pendingCount={pendingCount ?? 0} />
       <main className="flex-1 ml-64">
         <div className="p-8">{children}</div>
       </main>

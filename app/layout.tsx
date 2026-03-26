@@ -11,7 +11,7 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   title: {
     template: "%s | La Promesse",
-    default: "La Promesse — Logistique Canada–Afrique",
+    default: "La Promesse — Canada-Afrique",
   },
   description: "Envoyez vos colis du Canada vers l'Afrique en toute sécurité. Suivi en temps réel, collecte à domicile, livraison porte-à-porte.",
   manifest: "/manifest.webmanifest",

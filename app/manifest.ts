@@ -2,7 +2,7 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "La Promesse Logistiques",
+    name: "La Promesse Services",
     short_name: "La Promesse",
     description: "Envoyez vos colis du Canada vers l'Afrique. Suivi en temps réel.",
     start_url: "/",

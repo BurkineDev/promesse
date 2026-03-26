@@ -525,9 +525,9 @@ export function SubmitPackageForm({ routes, userId }: SubmitPackageFormProps) {
                 <p className="text-xs text-blue-600 mt-0.5">
                   Contactez-nous sur WhatsApp pour l&apos;adresse exacte et les horaires.
                 </p>
-                <a href="https://wa.me/14399782990" target="_blank" rel="noopener noreferrer"
+                <a href="https://wa.me/12638668387" target="_blank" rel="noopener noreferrer"
                   className="inline-flex items-center gap-1 text-xs text-blue-700 font-medium mt-1.5 hover:underline">
-                  💬 +1 439 978-2990
+                  💬 +1 (263) 866-8387
                 </a>
               </div>
             </div>

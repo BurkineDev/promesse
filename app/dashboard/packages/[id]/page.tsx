@@ -89,6 +89,13 @@ export default async function PackageDetailPage({
             🖨️ Bordereau
           </Link>
           <Link
+            href={`/dashboard/packages/${id}/invoice`}
+            target="_blank"
+            className="btn-secondary text-sm"
+          >
+            📄 Facture douane
+          </Link>
+          <Link
             href={`/dashboard/packages/${id}/edit`}
             className="btn-secondary flex items-center gap-2 text-sm"
           >

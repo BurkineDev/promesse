@@ -187,7 +187,7 @@ export default async function PortalHomePage() {
         </div>
         {/* Contacts */}
         <div className="bg-white divide-y divide-gray-50">
-          <a href="https://wa.me/14399782990" target="_blank" rel="noopener noreferrer"
+          <a href="https://wa.me/12638668387" target="_blank" rel="noopener noreferrer"
             className="flex items-center gap-4 px-5 py-4 hover:bg-gray-50 transition-colors">
             <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center flex-shrink-0 text-xl">
               🇨🇦
@@ -195,7 +195,7 @@ export default async function PortalHomePage() {
             <div className="flex-1">
               <p className="font-semibold text-gray-900 text-sm">Canada</p>
               <p className="text-gray-400 text-xs mt-0.5 flex items-center gap-1">
-                <Phone className="w-3 h-3" /> +1 439 978-2990
+                <Phone className="w-3 h-3" /> +1 (263) 866-8387
               </p>
             </div>
             <div className="flex items-center gap-1.5 bg-[#25D366] text-white text-xs font-semibold px-3 py-1.5 rounded-xl">
@@ -203,7 +203,7 @@ export default async function PortalHomePage() {
               Chat
             </div>
           </a>
-          <a href="https://wa.me/22666031661" target="_blank" rel="noopener noreferrer"
+          <a href="https://wa.me/22676169196" target="_blank" rel="noopener noreferrer"
             className="flex items-center gap-4 px-5 py-4 hover:bg-gray-50 transition-colors">
             <div className="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center flex-shrink-0 text-xl">
               🇧🇫
@@ -211,7 +211,7 @@ export default async function PortalHomePage() {
             <div className="flex-1">
               <p className="font-semibold text-gray-900 text-sm">Burkina Faso</p>
               <p className="text-gray-400 text-xs mt-0.5 flex items-center gap-1">
-                <Phone className="w-3 h-3" /> +226 66 03 16 61
+                <Phone className="w-3 h-3" /> +226 76 16 91 96
               </p>
             </div>
             <div className="flex items-center gap-1.5 bg-[#25D366] text-white text-xs font-semibold px-3 py-1.5 rounded-xl">

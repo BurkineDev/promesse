@@ -61,7 +61,7 @@ export default function HomeScreen() {
         <TouchableOpacity style={[styles.actionCard, styles.actionPrimary]} onPress={() => router.push("/submit")}>
           <Ionicons name="add-circle" size={32} color="#fff" />
           <Text style={styles.actionPrimaryLabel}>Soumettre un colis</Text>
-          <Text style={styles.actionPrimaryDesc}>Canada → Burkina Faso</Text>
+          <Text style={styles.actionPrimaryDesc}>Canada → Afrique de l'Ouest</Text>
         </TouchableOpacity>
 
         <View style={styles.actionsRow}>
@@ -75,7 +75,7 @@ export default function HomeScreen() {
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.actionSecondary}
-            onPress={() => Linking.openURL("https://wa.me/15141234567?text=Bonjour%20La%20Promesse")}
+            onPress={() => Linking.openURL("https://wa.me/12638668387?text=Bonjour%20La%20Promesse")}
           >
             <Ionicons name="logo-whatsapp" size={24} color="#16a34a" />
             <Text style={styles.actionSecondaryLabel}>WhatsApp</Text>
@@ -119,7 +119,7 @@ export default function HomeScreen() {
       <View style={styles.infoBlock}>
         <Ionicons name="information-circle-outline" size={20} color="#1e3a5f" />
         <Text style={styles.infoText}>
-          Livraison Canada → Burkina Faso par voie aérienne et maritime.
+          Livraison Canada → Afrique de l'Ouest par voie aérienne et maritime.
           Délais habituels : 7–14 jours (air), 30–45 jours (mer).
         </Text>
       </View>

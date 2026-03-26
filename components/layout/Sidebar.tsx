@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard, Users, Package, CreditCard, Search,
-  LogOut, Truck, AlertTriangle, CheckSquare, Globe, Megaphone, X,
+  LogOut, Truck, AlertTriangle, CheckSquare, Globe, Megaphone, X, UserPlus,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
@@ -18,6 +18,7 @@ const navItems = [
   { href: "/dashboard/payments",    label: "Paiements",        icon: CreditCard,      badge: false },
   { href: "/dashboard/incidents",   label: "Incidents",        icon: AlertTriangle,   badge: false },
   { href: "/dashboard/annonces",    label: "Annonces",         icon: Megaphone,       badge: false },
+  { href: "/dashboard/users",       label: "Utilisateurs",     icon: UserPlus,        badge: false },
 ];
 
 interface SidebarProps {

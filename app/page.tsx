@@ -37,7 +37,7 @@ export default function HomePage() {
             </div>
             <div>
               <p className="font-bold text-white leading-none text-sm">La Promesse</p>
-              <p className="text-blue-400 text-[10px] leading-none mt-0.5">Logistiques Canada–Afrique</p>
+              <p className="text-blue-400 text-[10px] leading-none mt-0.5">Canada-Afrique</p>
             </div>
           </Link>
 
@@ -485,7 +485,7 @@ export default function HomePage() {
               Créer mon compte gratuit
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </Link>
-            <a href="https://wa.me/14399782990" target="_blank" rel="noopener noreferrer"
+            <a href="https://wa.me/12638668387" target="_blank" rel="noopener noreferrer"
               className="inline-flex items-center justify-center gap-2 glass hover:bg-white/10 text-white font-semibold px-8 py-4 rounded-2xl transition-all text-lg">
               <span className="text-xl">💬</span> Nous contacter
             </a>
@@ -504,7 +504,7 @@ export default function HomePage() {
                 <div className="bg-gradient-to-br from-blue-500 to-blue-700 rounded-xl p-1.5">
                   <Package className="w-4 h-4 text-white" />
                 </div>
-                <span className="font-bold">La Promesse Logistiques</span>
+                <span className="font-bold">La Promesse Services</span>
               </div>
               <p className="text-blue-300/50 text-sm leading-relaxed">
                 Service de transport de colis Canada–Afrique de l&apos;Ouest depuis 2019.
@@ -530,19 +530,19 @@ export default function HomePage() {
             <div>
               <p className="text-sm font-semibold mb-4 text-white/60">Contact</p>
               <div className="space-y-2.5">
-                <a href="https://wa.me/14399782990" target="_blank" rel="noopener noreferrer"
+                <a href="https://wa.me/12638668387" target="_blank" rel="noopener noreferrer"
                   className="flex items-center gap-2 text-sm text-blue-300/50 hover:text-white transition-colors">
-                  💬 WhatsApp Canada (+1 439 978-2990)
+                  💬 WhatsApp Canada (+1 (263) 866-8387)
                 </a>
-                <a href="https://wa.me/22666031661" target="_blank" rel="noopener noreferrer"
+                <a href="https://wa.me/22676169196" target="_blank" rel="noopener noreferrer"
                   className="flex items-center gap-2 text-sm text-blue-300/50 hover:text-white transition-colors">
-                  💬 WhatsApp Burkina (+226 66 03 16 61)
+                  💬 WhatsApp Burkina (+226 76 16 91 96)
                 </a>
               </div>
             </div>
           </div>
           <div className="border-t border-white/10 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-blue-300/30">
-            <p>© {new Date().getFullYear()} La Promesse Logistiques. Tous droits réservés.</p>
+            <p>© {new Date().getFullYear()} La Promesse Services. Tous droits réservés.</p>
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />

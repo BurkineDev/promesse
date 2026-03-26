@@ -73,11 +73,11 @@ export default function TrackPage({
       {/* ── Footer strip ── */}
       <div className="border-t border-white/5 py-8">
         <div className="max-w-2xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-blue-300/40">
-          <p>© {new Date().getFullYear()} La Promesse Logistiques</p>
+          <p>© {new Date().getFullYear()} La Promesse Services</p>
           <div className="flex items-center gap-4">
             <Link href="/" className="hover:text-blue-200 transition-colors">Accueil</Link>
             <Link href="/portal/register" className="hover:text-blue-200 transition-colors">Mon espace</Link>
-            <a href="https://wa.me/14399782990" target="_blank" rel="noopener noreferrer"
+            <a href="https://wa.me/12638668387" target="_blank" rel="noopener noreferrer"
               className="hover:text-blue-200 transition-colors">💬 WhatsApp</a>
           </div>
         </div>

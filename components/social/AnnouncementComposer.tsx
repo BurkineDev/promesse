@@ -18,13 +18,13 @@ const TEMPLATES = [
   {
     label: "📦 Nouveau départ",
     title: "Nouveau départ de colis !",
-    body: "Un nouveau lot de colis part de Montréal cette semaine ! 🛫\n\nDéposez vos colis avant vendredi pour le prochain envoi.\n\n📍 Collecte à domicile disponible\n📞 WhatsApp : +1 439 978-2990",
+    body: "Un nouveau lot de colis part de Montréal cette semaine ! 🛫\n\nDéposez vos colis avant vendredi pour le prochain envoi.\n\n📍 Collecte à domicile disponible\n📞 WhatsApp : +1 (263) 866-8387",
     category: "INFO",
   },
   {
     label: "🔥 Promo",
     title: "Promotion spéciale !",
-    body: "🎉 Offre limitée !\n\n-15% sur tous les envois aériens cette semaine.\n\nCode promo : PROMESSE15\n\nConditions :\n✅ Valable jusqu'au dimanche\n✅ Toutes destinations\n\n📞 +1 439 978-2990",
+    body: "🎉 Offre limitée !\n\n-15% sur tous les envois aériens cette semaine.\n\nCode promo : PROMESSE15\n\nConditions :\n✅ Valable jusqu'au dimanche\n✅ Toutes destinations\n\n📞 +1 (263) 866-8387",
     category: "PROMO",
   },
   {
@@ -221,7 +221,7 @@ export function AnnouncementComposer() {
                       LP
                     </div>
                     <div>
-                      <p className="font-semibold text-sm text-gray-900">La Promesse Logistiques</p>
+                      <p className="font-semibold text-sm text-gray-900">La Promesse Services</p>
                       <p className="text-xs text-gray-400">Maintenant · 🌍</p>
                     </div>
                   </div>
@@ -247,7 +247,7 @@ export function AnnouncementComposer() {
                 {/* WhatsApp style preview */}
                 <div className="bg-[#e5ddd5] rounded-xl p-4">
                   <div className="bg-white rounded-xl rounded-tl-none p-3 max-w-sm shadow-sm">
-                    <p className="text-sm font-semibold text-green-700 mb-1">La Promesse Logistiques</p>
+                    <p className="text-sm font-semibold text-green-700 mb-1">La Promesse Services</p>
                     <p className="text-sm text-gray-900 whitespace-pre-line">{form.body.substring(0, 200)}{form.body.length > 200 ? "..." : ""}</p>
                     <p className="text-xs text-blue-600 mt-1">{shareUrl}</p>
                     <p className="text-right text-[10px] text-gray-400 mt-1">12:00 ✓✓</p>

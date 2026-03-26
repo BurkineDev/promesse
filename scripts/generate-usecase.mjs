@@ -640,12 +640,12 @@ const doc = new Document({
           }),
           new Paragraph({
             alignment: AlignmentType.CENTER,
-            children: [new TextRun({ text: "WhatsApp Canada : +1 439 978-2990", size: 22, color: "374151" })],
+            children: [new TextRun({ text: "WhatsApp Canada : +1 (263) 866-8387", size: 22, color: "374151" })],
             spacing: { after: 60 },
           }),
           new Paragraph({
             alignment: AlignmentType.CENTER,
-            children: [new TextRun({ text: "WhatsApp Burkina Faso : +226 66 03 16 61", size: 22, color: "374151" })],
+            children: [new TextRun({ text: "WhatsApp Burkina Faso : +226 76 16 91 96", size: 22, color: "374151" })],
           }),
         ),
 

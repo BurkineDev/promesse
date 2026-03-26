@@ -39,7 +39,7 @@ export default function LoginScreen() {
             <Text style={styles.logoText}>LP</Text>
           </View>
           <Text style={styles.appName}>La Promesse</Text>
-          <Text style={styles.appSubtitle}>Services Logistiques</Text>
+          <Text style={styles.appSubtitle}>Canada-Afrique</Text>
         </View>
 
         {/* Form */}

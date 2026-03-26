@@ -203,7 +203,7 @@ export default function RegisterPage() {
         </div>
 
         <p className="relative z-10 text-blue-400/30 text-xs">
-          © {new Date().getFullYear()} La Promesse Logistiques
+          © {new Date().getFullYear()} La Promesse Services
         </p>
       </div>
 
@@ -459,7 +459,7 @@ export default function RegisterPage() {
                     suivre un colis ?
                   </Link>
                 </div>
-                <a href="https://wa.me/14399782990" target="_blank" rel="noopener noreferrer"
+                <a href="https://wa.me/12638668387" target="_blank" rel="noopener noreferrer"
                   className="inline-flex items-center gap-1.5 text-sm text-gray-400 hover:text-gray-600 transition-colors">
                   <span className="text-base">💬</span> Besoin d&apos;aide ? WhatsApp
                 </a>

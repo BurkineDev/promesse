@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "La Promesse",
-    "slug": "promesse-logistiques",
+    "name": "La Promesse Services",
+    "slug": "la-promesse-services",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
